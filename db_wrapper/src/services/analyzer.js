@@ -9,27 +9,20 @@ export async function runQuery(sqlQuery, userContext) {
     const behaviour = await user_behaviour.findOne({ user_id: userContext.id });
     console.log('🛡️ User Behaviour from DB:', behaviour);
 
-    // 2️⃣ Fetch past query behaviour for this user
-    const pastQueriesCursor = await user_query_behaviour
-      .find({ user_id: userContext.id })
-      .sort({ created_at: -1 })
-      .limit(10); // you can adjust how many past queries to include
-    const pastQueries = await pastQueriesCursor.toArray();
-    console.log('📝 Past Queries:', pastQueries);
+    // 2️⃣ Prepare context for analyzer including past queries
+    // Ensure single document for user and append current query
+    
+    // 3️⃣ Fetch the single document for this user to include past queries in context
+    const userQueryDoc = await user_query_behaviour.findOne({ user_id: userContext.id });
+    console.log('📝 Past Queries:', userQueryDoc.queries);
 
-    // Prepare context for analyzer
     const context = {
       threat_level: behaviour?.threat_level || 'unknown',
       reason: behaviour?.reason || userContext.reason,
-      past_queries: pastQueries.map(doc => ({
-        query: doc.queries,
-        threat_level: doc.threat_level,
-        reason: doc.reason,
-        created_at: doc.created_at
-      }))
+      past_queries: userQueryDoc.queries
     };
 
-    // 3️⃣ Send query + context to Python LLM analyzer
+    // 4️⃣ Send query + context to Python LLM analyzer
     const response = await fetch('http://localhost:8123/v1/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,16 +37,37 @@ export async function runQuery(sqlQuery, userContext) {
     const result = await response.json();
     console.log('🔍 Analyzer Result:', result);
 
-    // 4️⃣ Log current query to user_query_behaviour
-    await user_query_behaviour.insertOne({
-      user_id: userContext.id,
-      threat_level: result.analysis?.decision === 'safe' ? 'low' : behaviour?.threat_level || 'medium',
-      reason: result.analysis?.explanation || behaviour?.reason || 'No reason provided',
-      queries: [sqlQuery],
+    // 5️⃣ Update last inserted query with analyzer decision and explanation
+     // 1️⃣ Ensure the document exists, create if not
+await user_query_behaviour.updateOne(
+  { user_id: userContext.id },
+  {
+    $setOnInsert: {
+      threat_level: behaviour?.threat_level || 'unknown',
+      reason: behaviour?.reason || userContext.reason,
       created_at: new Date()
-    });
+      // Don't include `queries` here
+    }
+  },
+  { upsert: true }
+);
 
-    // 5️⃣ Execute query if safe
+// 2️⃣ Push the new query with analyzer result
+await user_query_behaviour.updateOne(
+  { user_id: userContext.id },
+  {
+    $push: {
+      queries: {
+        query: sqlQuery,
+        threat_level: result.analysis?.decision === 'safe' ? 'low' : behaviour?.threat_level || 'medium',
+        reason: result.analysis?.explanation || behaviour?.reason || 'No reason provided',
+        created_at: new Date()
+      }
+    }
+  }
+);
+
+    // 6️⃣ Execute query if safe
     if (result.analysis?.decision === 'safe') {
       return await query(sqlQuery);
     } else {
