@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  monitor:
+    build: ./monitor
+    container_name: vm_monitor
+    ports:
+      - "4200:4200"
+    restart: unless-stopped
+
+  agent:
+    build: ./agent
+    container_name: vm_agent
+    depends_on:
+      - monitor
+    restart: unless-stopped

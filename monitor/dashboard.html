@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>VM Monitor Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 16px; }
+    .event { border-bottom:1px solid #eee; padding:6px; }
+    .ts { color:#555; font-size:12px; }
+    pre { margin:0; font-size:13px; white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+<h1>VM / WSL Activity Monitor</h1>
+<p>Live telemetry from agent containers.</p>
+<button id="reload">Reload</button> <span id="status"></span>
+<div id="log"></div>
+
+<script>
+const log = document.getElementById("log");
+function add(ev){
+  const d=document.createElement("div");
+  d.className="event";
+  d.innerHTML=`<div class='ts'>${ev.receivedAt||ev.timestamp} - ${ev.host}</div><pre>${escape(JSON.stringify(ev,null,2))}</pre>`;
+  log.prepend(d);
+  while(log.childNodes.length>200)log.removeChild(log.lastChild);
+}
+function escape(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+document.getElementById("reload").onclick=async()=>{
+  const r=await fetch("/api/events");const arr=await r.json();log.innerHTML="";arr.reverse().forEach(add);
+}
+const es=new EventSource("/events/stream");
+es.onmessage=e=>add(JSON.parse(e.data));
+es.onopen=()=>status.textContent="connected";es.onerror=()=>status.textContent="disconnected";
+</script>
+</body>
+</html>
