@@ -15,7 +15,7 @@ if (!fs.existsSync(FILE)) fs.writeFileSync(FILE, "[]");
 
 function save() { fs.writeFileSync(FILE, JSON.stringify(events, null, 2)); }
 
-// receive telemetry
+
 app.post("/api/telemetry", (req, res) => {
   const ev = { receivedAt: new Date().toISOString(), ...req.body };
   events.push(ev);
