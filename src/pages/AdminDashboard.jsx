@@ -35,7 +35,7 @@ export default function AdminDashboard() {
               Observe real-time employee logs, detect potential misuse, and analyze threat patterns across the organization.
             </p>
             <button
-              onClick={() => alert('Redirecting to employee activity analytics...')}
+              onClick={() => navigate("/Dashboard/liveMonitoringAnalytics")}
               className="px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-sm font-medium transition-colors duration-200"
             >
               View Live Activities
@@ -63,10 +63,10 @@ export default function AdminDashboard() {
           <div className="rounded-2xl border border-gray-800 bg-zinc-900 p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center gap-3 mb-4">
               <Database className="w-6 h-6 text-amber-500" />
-              <h2 className="text-xl font-semibold">Shared DB Security Logs</h2>
+              <h2 className="text-xl font-semibold">Manipulate Shared DB</h2>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              Access and audit live database logs. Validate blockchain-based integrity proofs and detect real-time anomalies.
+               Try manipulating the company's shared DB by writing sql queries. This will tell you how malicious code
             </p>
             <button
               onClick={() => alert('Redirecting to shared database logs...')}

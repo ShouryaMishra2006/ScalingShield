@@ -11,11 +11,8 @@ function Test() {
 
   const checkBackendConnection = async () => {
     try {
-      // Get backend URL from environment variable
       const baseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
       setBackendUrl(baseUrl)
-
-      // Test basic backend connectivity
       const response = await fetch(`${baseUrl}`, {
         method: 'GET',
         headers: {

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import Navbar from "./components/Navbar";
-import HeroScene from "./components/HeroScene";
-import EmployeeGrid from "./components/EmployeeGrid";
-import ThreatTable from "./components/ThreatTable";
+import Navbar from "../Navbar";
+import HeroScene from "../HeroScene";
+import EmployeeGrid from "../EmployeeGrid";
+import ThreatTable from "../ThreatTable";
 
 const ACTIONS = ["login", "file_access", "usb_insert", "vpn_connect", "privilege_change"];
 const STATUS = ["ok", "warning", "failed"];
@@ -22,6 +22,8 @@ function App() {
       .then((data) => setEmployees(data))
       .catch((err) => console.error("Error fetching users:", err));
   }, []);
+
+
   useEffect(() => {
     if (employees.length === 0) return;
 
@@ -64,9 +66,11 @@ function App() {
       const res = await fetch(`http://localhost:5000/api/users/${id}/flag`, {
         method: "PATCH",
       });
+      
         setEmployees((prev) =>
           prev.map((e) => (e._id === id ? { ...e, flagged: !e.flagged } : e))
         );
+      
     } catch (err) {
       console.error("Error flagging employee:", err);
     }

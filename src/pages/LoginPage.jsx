@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function LoginPage() {
   const navigate = useNavigate();
   const [role, setRole] = useState("");
   const [form, setForm] = useState({ name: "", email: "", password: "", otp: "" });
-  const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState("");
 
   const ADMIN_ID = "12345";
@@ -14,22 +14,24 @@ function LoginPage() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  const handleOtpSend = () => {
+  const handleEmployeeLogin = async () => {
     if (!form.email || !form.password) {
-      setError("Please enter email and password before sending OTP.");
+      setError("Please enter email and password.");
       return;
     }
-    setOtpSent(true);
-    setError("");
-    alert("Mock OTP sent to your email (123456)");
-  };
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email: form.email,
+        password: form.password,
+      });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-  const handleOtpVerify = () => {
-    if (form.otp === "123456") {
+    
       navigate("/employee-dashboard");
-    } else {
-      setError("Invalid OTP. Please try again.");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err.response?.data?.message || "Login failed");
     }
   };
 
@@ -93,37 +95,11 @@ function LoginPage() {
               className="w-full rounded-md border border-gray-700 bg-zinc-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
 
-            {!otpSent ? (
-              <button
-                onClick={handleOtpSend}
-                className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 rounded-md text-white font-medium transition"
-              >
-                Send OTP
-              </button>
-            ) : (
-              <>
-                <input
-                  type="text"
-                  name="otp"
-                  placeholder="Enter OTP"
-                  value={form.otp}
-                  onChange={handleChange}
-                  className="w-full rounded-md border border-gray-700 bg-zinc-900 px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                  onClick={handleOtpVerify}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-medium transition"
-                >
-                  Verify OTP
-                </button>
-              </>
-            )}
-
             <button
-              className="w-full py-2 bg-red-600 hover:bg-red-700 rounded-md text-white font-medium transition"
-              onClick={() => alert("Google Login Coming Soon!")}
+              onClick={handleEmployeeLogin}
+              className="w-full py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-white font-medium transition"
             >
-              Login with Google
+              Login
             </button>
           </div>
         )}
