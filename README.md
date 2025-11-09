@@ -10,10 +10,10 @@ A next-generation security framework that blends deep behavioral analytics with 
 
   
 ## Demo Video Link:
-  <a href="https://drive.google.com/drive/folders/1BW6PjxNC1bhA9a6gbetEHCX_rtiwV0PT?usp=sharing"></a>
+  <a href="https://drive.google.com/drive/folders/1BW6PjxNC1bhA9a6gbetEHCX_rtiwV0PT?usp=sharing">Video</a>
   
 ## Presentation Link:
-
+  <a href="https://drive.google.com/drive/folders/1BW6PjxNC1bhA9a6gbetEHCX_rtiwV0PT?usp=sharing">PPT</a>
   
   
 ## Table of Contents:
