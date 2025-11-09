@@ -37,7 +37,10 @@ going all the way from simple rule based checks to context aware LLM reasoning a
 | **5**   | **Behavioral Analysis Engine**       | Converts process logs into embeddings using Sentence-BERT and stores them in FAISS for real-time cosine similarity analysis and anomaly detection.      |
 | **6**   | **Query Wrapper & Validation Layer** | Intercepts and validates database queries. Safe queries execute; unsafe ones return possible reasoning for rejection using context-aware LLM reasoning. |
 | **7**   | **Virtual Machine / WSL Monitoring** | Extends monitoring to virtual machines and WSL environments using lightweight endpoint agents.                                                          |
-| **8**   | **Rate Limiting Mechanism**          | Prevents abuse by rate-limiting clients who attempt rapid or repeated query requests.                                                                   |
+| **8**   | **Rate Limiting Mechanism**          | Prevents abuse by rate-limiting clients who attempt rapid or repeated query requests.  
+|
+<img width="6996" height="1936" alt="Mermaid Chart - Create complex, visual diagrams with text -2025-11-09-035033" src="https://github.com/user-attachments/assets/7b1da9f8-755b-47f8-a1e6-fb70b3b6a79c" />
+
 
 
 ## Technology Stack:
