@@ -10,14 +10,7 @@ import json
 import requests
 from processor_features import extract_and_score
 
-# Uncomment the following lines if you need ASGI support
-# from asgiref.wsgi import WsgiToAsgi
-
-# --------------------------
-# Flask + Flask-SocketIO server
-# --------------------------
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 socketio = SocketIO(
@@ -28,10 +21,8 @@ socketio = SocketIO(
     engineio_logger=True
 )
 
-# --------------------------
-# External API Configuration
-# --------------------------
-EXTERNAL_API_URL = "https://2zxmlsnk-3000.inc1.devtunnels.ms/"
+
+EXTERNAL_API_URL = os.getenv["EXTERNAL_URL"]
 
 def send_to_external_api(alert_data):
     """
@@ -39,7 +30,7 @@ def send_to_external_api(alert_data):
     Only sends: threat_level, risk_score, and reason
     """
     try:
-        # Extract only the required fields
+        
         filtered_data = {
             "threat_level": alert_data.get("threat_level", "unknown"),
             "risk_score": alert_data.get("rule_score", 0),
@@ -48,7 +39,7 @@ def send_to_external_api(alert_data):
             "event_id": alert_data.get("event_id", "unknown")
         }
         
-        # Send POST request to external API
+    
         response = requests.post(
             EXTERNAL_API_URL,
             json=filtered_data,
@@ -68,9 +59,7 @@ def send_to_external_api(alert_data):
     except Exception as e:
         print(f"[EXTERNAL API] Unexpected error: {e}")
 
-# --------------------------
-# Blockchain
-# --------------------------
+
 class Block:
     def __init__(self, index, data, previous_hash):
         self.index = index
@@ -123,15 +112,13 @@ class Blockchain:
 log_queue = queue.Queue()
 blockchain = Blockchain()
 
-# --------------------------
-# Background task to mine blockchain
-# --------------------------
+
 def blockchain_consumer(batch_size=5):
     print("[STARTUP] Blockchain consumer started")
     while True:
         batch = []
         try:
-            # Collect batch_size items or timeout after 1 second
+            
             for _ in range(batch_size):
                 try:
                     result = log_queue.get(timeout=1.0)
@@ -144,14 +131,14 @@ def blockchain_consumer(batch_size=5):
             if batch:
                 block = blockchain.add_block(batch)
                 
-                # Emit block update
+                
                 socketio.emit("blockchain_update", {
                     "block_index": block.index,
                     "chain_valid": blockchain.verify_chain(),
                     "logs": batch
                 }, namespace='/')
                 
-                # Emit individual alerts and send to external API
+               
                 for alert in batch:
                     socketio.emit("new_alert", alert, namespace='/')
                     
@@ -170,9 +157,7 @@ def blockchain_consumer(batch_size=5):
             print(f"[ERROR] Blockchain consumer error: {e}")
             time.sleep(1)
 
-# --------------------------
-# Start background thread on app start
-# --------------------------
+
 consumer_thread = None
 
 def start_background_tasks():
@@ -186,9 +171,7 @@ def start_background_tasks():
         consumer_thread.start()
         print("[STARTUP] Background thread started")
 
-# --------------------------
-# HTTP endpoint to receive logs
-# --------------------------
+
 @app.route('/logs', methods=['POST'])
 def receive_logs():
     try:
@@ -206,9 +189,7 @@ def receive_logs():
         print(f"[ERROR] Error processing log: {e}")
         return jsonify({"error": str(e)}), 500
 
-# --------------------------
-# Health check
-# --------------------------
+
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({
@@ -218,9 +199,6 @@ def health_check():
         "queue_size": log_queue.qsize()
     }), 200
 
-# --------------------------
-# Get blockchain
-# --------------------------
 @app.route('/blockchain', methods=['GET'])
 def get_blockchain():
     return jsonify({
@@ -229,9 +207,7 @@ def get_blockchain():
         "valid": blockchain.verify_chain()
     }), 200
 
-# --------------------------
-# Socket.IO Events
-# --------------------------
+
 @socketio.on('connect')
 def handle_connect():
     print(f"[SOCKET] Client connected: {request.sid}")
@@ -253,18 +229,15 @@ def handle_blockchain_request():
         "valid": blockchain.verify_chain()
     })
 
-# --------------------------
-# Run server
-# --------------------------
+
 if __name__ == '__main__':
-    # Start background tasks
+
     start_background_tasks()
-    
-    # Run the Flask server directly (NOT with uvicorn)
+
     socketio.run(
         app,
         host='0.0.0.0',
         port=8000,
         debug=True,
-        use_reloader=False  # Important: disable reloader to prevent duplicate threads
+        use_reloader=False  
     )
