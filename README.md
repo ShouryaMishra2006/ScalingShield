@@ -1,4 +1,4 @@
-<h1 align="center">Hack36 9.0 Template Readme</h1>
+<h1 align="center">ScalingShield</h1>
 <p align="center">
 </p>
 
@@ -28,6 +28,16 @@ cosine similarity analysis and anomaly detection
 whenever the employee tries to run query in the company's database the query goes through the Wrapper that has layered security checks
 going all the way from simple rule based checks to context aware LLM reasoning and decides to execute or to discard
 
+| Section | Title                                | Description                                                                                                                                             |
+| ------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1**   | **Login & Roles**                    | Employee and Admin login functionality with role-based access.                                                                                          |
+| **2**   | **Employee Dashboard**               | Displays the employee’s local credential theft alerts and real-time analysis through the simulator.                                                     |
+| **3**   | **Admin Dashboard**                  | Shows real-time employee monitoring details, activity logs, and flagging system for suspicious users.                                                   |
+| **4**   | **Process Monitoring Module**        | Monitors background processes and detects malicious domain access. Sends logs to the Behavioral Analysis Engine.                                        |
+| **5**   | **Behavioral Analysis Engine**       | Converts process logs into embeddings using Sentence-BERT and stores them in FAISS for real-time cosine similarity analysis and anomaly detection.      |
+| **6**   | **Query Wrapper & Validation Layer** | Intercepts and validates database queries. Safe queries execute; unsafe ones return possible reasoning for rejection using context-aware LLM reasoning. |
+| **7**   | **Virtual Machine / WSL Monitoring** | Extends monitoring to virtual machines and WSL environments using lightweight endpoint agents.                                                          |
+| **8**   | **Rate Limiting Mechanism**          | Prevents abuse by rate-limiting clients who attempt rapid or repeated query requests.                                                                   |
 
 
 ## Technology Stack:
